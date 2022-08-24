@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Final Project</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
+    <style>
+         h1{
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        svg{
+            margin-left: 225px;;
+        }
+        ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: #333;
+        }
+        
+        li {
+          float: right;
+        }
+        
+        li a {
+          display: block;
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+        }
+        
+        li a:hover {
+          background-color: #111;
+        }
+        #navBar_text{
+            color: white;
+            font-size: 1.5em;
+            margin-left: 20px;
+            margin-top: 10px;
+            
+        }
+        footer{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            margin-top: 75px;
+
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <ul>
+                <li style="float:left" id="navBar_text" >FIFA WORLD CUP 2018</li>
+                <li><a href="WorldCup.html"> World cup</a></li>
+                <li><a href="linechart.html"> Rankings</a></li>
+                <li><a href="barchart.html"> Highest goals</a></li>
+
+            </ul>
+        </div>
+    </nav>
+    <u><h1>FIFA 2108 World Ranking VS Tournament Ranking</h1></u>
+    <div id="viz">
+        <svg style="height:500px; width:1000px"> </svg>
+    </div>
+  
+    <script>
+ 
+        d3.csv("../data/World_cup_2018.csv", data=>lineChart(data));
+        
+   
+        function lineChart(incomingData){
+
+            var minmaxRanking = d3.extent(incomingData, d => parseInt(d.World_ranking));
+            var tRanking = d3.max(incomingData, d => parseInt(d.Tournament_ranking));
+            
+
+            var xScale = d3.scaleLinear().domain([minmaxRanking[0], minmaxRanking[1]]).range([20,980]);
+            var yScale = d3.scaleLinear().domain([0,tRanking+5]).range([480,20]);
+
+            var yAxis = d3.axisRight()
+                            .scale(yScale)
+                            .ticks(10)
+                            .tickSize(-960);
+            
+            var xAxis = d3.axisBottom() 
+                            .scale(xScale)
+                            .tickSize(-460) 
+                         
+
+  
+            d3.selectAll("svg")
+                .append("g")
+                .attr("id", "yAxisG")
+                .attr("transform", `translate(980,0)`)
+                .call(yAxis);
+                            
+            d3.select("svg")
+                .append("g")
+                .attr("id", "xAxisG")
+                .attr("transform", `translate(0,480)`)
+                .call(xAxis);    
+            
+           
+            d3.select("svg").selectAll("circle")
+                            .data(incomingData)
+                            .enter()
+                            .append("circle")
+                            .attr("fill", "#47C7FC")
+                            .attr("r",5)
+                            .attr("cx", d => xScale(d.World_ranking))
+                            .attr("cy", d =>  yScale(d.Tournament_ranking));
+
+
+            var dataLine = d3.line()
+                            .x(d => xScale(d.World_ranking))
+                            .y(d => yScale(d.Tournament_ranking));
+
+            dataLine.curve(d3.curveCardinal);
+
+            d3.select("svg")
+                    .append("path")
+                    .attr("d", dataLine(incomingData))
+                    .attr("fill", "none")
+                    .attr("stroke", "#FF8000")
+                    .attr("stroke-width", 2);
+        }
+
+    </script>
+    <footer>
+        <i><p>Tirth Nileshbhai Patel@COPYRIGHT</p></i>
+    </footer>
+</body>
+</html>

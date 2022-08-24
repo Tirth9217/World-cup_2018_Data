@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Project</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
+    <script src = "https://d3js.org/d3.v4.min.js"></script>
+    <style>
+        h1{
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+      svg {
+          border: 3px solid #47C7FC ;
+          border-radius: 25px;
+          margin-left: 300px;
+        
+        }
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        li {
+            float: right;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        li a:hover {
+                    background-color: #111;
+        }   
+        #navBar_text{
+            color: white;
+            font-size: 1.5em;
+            
+        }
+        footer{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+
+        }
+        #navBar_text{
+            color: white;
+            font-size: 1.5em;
+            margin-left: 20px;
+            margin-top: 10px;
+            
+        }
+        #buttons{
+            margin-left: 425px;
+            margin-bottom: 20px;
+            
+        }
+        button{
+            background-color: #333;
+            color: white;
+            margin-right: 20px;
+            padding: 5px 15px;
+            text-align: center;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div>
+            <ul>
+                <li style="float:left" id="navBar_text" >FIFA WORLD CUP 2018</li>
+                <li><a href="WorldCup.html"> World cup</a></li>
+                <li><a href="linechart.html"> Rankings</a></li>
+                <li><a href="barchart.html"> Highest goals</a></li>
+
+            </ul>
+        </div>
+    </nav>
+<u><h1> World cup 2018</h1></u>
+   
+       
+        <svg style="width: 800px; height: 575px"></svg>
+    
+
+    <script>
+        var countriesParticipated = [];
+        var semiFinalist = [];
+        var winners = [];
+        //var cHighestGoals=[];
+        var PromiseWrapper = (xhr, d) => new Promise(resolve => xhr(d, (p) => resolve(p)));
+      
+        Promise
+            .all([
+                PromiseWrapper(d3.json,"../data/world.geojson"),
+                PromiseWrapper(d3.csv,"../data/World_cup_2018.csv")
+               // PromiseWrapper(d3.csv,"../data//World_cup_goals.csv")
+            ])
+            .then(resolve => {
+                createMap(resolve[0], resolve[1]);
+            });
+
+            function createMap(countries, worldcups) {
+
+           worldcups.forEach(d => {
+                countriesParticipated.push(d.Country);
+                semiFinalist.push('Belgium','France','United Kingdom','Croatia');
+                winners.push('Brazil');
+               
+            });
+
+            var projection = d3.geoMercator()
+                    .scale(110)
+                    .translate([350, 350]); 
+
+            var geoPath = d3.geoPath().projection(projection);
+
+            d3.select("svg")
+                .selectAll("path")
+                .data(countries.features)
+                .enter()
+                .append("path")
+                .attr("d", geoPath)
+                .attr('class', 'countries')
+                .style("fill", "#adadad")
+                .style("stroke", "#000000")
+                .style("stroke-width", "0.2");
+        }
+
+            function setToInitial(){
+                d3.selectAll("path.countries")
+                    .style("fill","#adadad");
+            }
+            function wclocation(){
+                setToInitial();
+                d3.selectAll("path.countries")
+                    .filter((p, q) => countriesParticipated.includes(p.properties.name))
+                    .style("fill","#ff8000");
+            }
+            function won(){
+                setToInitial();
+                d3.selectAll("path.countries")
+                .filter((p, q) => winners.includes(p.properties.name))
+                .style("fill","#ff8000");
+            } 
+            function runners(){
+                setToInitial();
+                d3.selectAll("path.countries")
+                    .filter((p, q) => semiFinalist.includes(p.properties.name))
+                    .style("fill","#ff8000");
+            }
+    </script>
+ 
+<div id="buttons">
+    <button onclick="wclocation()" name="locationButton">Countries Participated</button>
+    <button onclick="runners()" name="runnerUpButton">World Cup Runner up</button>
+    <button onclick="won()" name="winnerButton"> Winners of 2018</button>
+    
+</div>
+
+<footer>
+    <i><p>Tirth Nileshbhai Patel@COPYRIGHT</p></i>
+</footer>
+</body>
+</html>

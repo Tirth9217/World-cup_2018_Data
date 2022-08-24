@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
+    <title>Final Project</title>
+    <style>
+         h1{
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        svg{
+            margin-left: 300px;;
+        }
+        ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: #333;
+        }
+        
+        li {
+          float: right;
+        }
+        
+        li a {
+          display: block;
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+        }
+        
+        li a:hover {
+          background-color: #111;
+        }
+        #navBar_text{
+            color: white;
+            font-size: 1.5em;
+            margin-left: 20px;
+            margin-top: 10px;
+            
+        }
+        footer{
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            margin-top: 75px;
+
+        }
+        </style>
+</head>
+
+<body>
+    <nav>
+        <div>
+            <ul>
+                <li style="float:left" id="navBar_text" >FIFA WORLD CUP 2018</li>
+                <li><a href="WorldCup.html"> World cup</a></li>
+                <li><a href="linechart.html"> Rankings</a></li>
+                <li><a href="barchart.html"> Highest goals</a></li>
+
+
+            </ul>
+        </div>
+    </nav>
+    <u><h1>Highest Number of Goals Scored by Players</h1></u>
+    <svg style="width:1000px;height:500px;">
+    </svg>
+
+    <script>
+        d3.csv("../data/World_cup_goals.csv", data => dataViz(data));
+
+        function dataViz(incomingData) {
+            var goals = d3.max(incomingData, d => parseInt(d.Goals));
+            var yScale = d3.scaleLinear().domain([0, goals]).range([0, 450]);
+            
+            
+
+            d3.select("svg")
+                .selectAll("rect")
+                .data(incomingData)
+                .enter()
+                .append("rect")
+                    .attr("width", 50)
+                    .attr("height", d => yScale(parseFloat(d.Goals)))
+                    .attr("x", (d,i) => i * 70)
+                    .attr("y", d => 500 - yScale(parseInt(d.Goals)))
+                    .style("fill", "#47C7FC")
+                    .style("stroke", "#FF8000")
+                    .style("stroke-width", "2px")
+                    .on("click",clickFunction)
+                    .on('mouseover', function(){
+                            d3.select(this)
+                                .transition()
+                                .style('fill', '#111111');
+                        })
+                        .on('mouseout', function(){
+                            d3.select(this)
+                                .transition()
+                                .duration(100)
+                                .style('fill', '#00A19C');
+                        })
+
+                    function clickFunction(data){
+                alert("Player Name- " +data.Name+' \n '+"Country - " +data.Country+' \n'+"Goals Scored - " +data.Goals);
+            }
+        }
+
+       
+
+    </script>
+    <i style="text-align: center;"><p>CLICK ON BAR TO CHECK PLAYERS INFO</p></i>
+    <footer>
+        <i><p>Tirth Nileshbhai Patel@COPYRIGHT</p></i>
+    </footer>
+</body>
+
+</html>
